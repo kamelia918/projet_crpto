@@ -363,11 +363,16 @@
         </div>
         <ul class="sub-menu">
           
-          {% if request.user.is_authenticated %}
-
-          <li><a href="{% url "logout"%}">Logout</a></li>
-          {%else%}
-
+         {% if request.user.is_authenticated %}
+            <li>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" style="background: none; border: none; padding: 0; color: inherit; cursor: pointer;">
+                  Logout
+                </button>
+              </form>
+            </li>
+          {% else %}
           <li><a href="/login">Login</a></li>
           <li><a href="/register">Sign Up</a></li>
           {%endif%}
