@@ -153,3 +153,10 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 # Other forms here
+from django import forms
+from .models import Patient
+
+class PatientProfileForm(forms.ModelForm):
+    class Meta:
+        model = Patient
+        fields = ['date_of_birth', 'address', 'medical_history', 'email', 'MRN']

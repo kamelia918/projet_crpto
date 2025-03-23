@@ -364,8 +364,9 @@
         <ul class="sub-menu">
           
          {% if request.user.is_authenticated %}
-            <li>
-              <form method="post" action="{% url 'logout' %}">
+            
+              <li><a href="{% url 'profile' %}">Profile</a></li>
+              <li><form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit" style="background: none; border: none; padding: 0; color: inherit; cursor: pointer;">
                   Logout

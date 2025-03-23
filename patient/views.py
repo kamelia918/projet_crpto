@@ -99,7 +99,29 @@ def register(request):
     return render(request, "patient/register.html", {"form": form})
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Patient
+from .forms import PatientProfileForm
 
+@login_required
+def profile(request):
+    user = request.user
+
+    # Check if the user is a patient
+    if user.groups.filter(name='patient').exists():
+        patient, created = Patient.objects.get_or_create(user=user)
+        if request.method == 'POST':
+            form = PatientProfileForm(request.POST, instance=patient)
+            if form.is_valid():
+                form.save()
+                return redirect('profile')
+        else:
+            form = PatientProfileForm(instance=patient)
+        return render(request, 'patient/profile.html', {'form': form, 'is_patient': True})
+    else:
+        # For non-patient users, display user information
+        return render(request, 'patient/profile.html', {'user': user, 'is_patient': False})
 
 def patientinformation(request):
     if request.method == "POST":
