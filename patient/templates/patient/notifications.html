@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Notifications</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li.notification {
+            background-color: #fdfdfd;
+            margin-bottom: 1rem;
+            padding: 1rem 1.5rem;
+            border-left: 6px solid #4a90e2;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        li.notification:hover {
+            transform: scale(1.01);
+        }
+
+        .timestamp {
+            display: block;
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 0.4rem;
+        }
+
+        .delete-btn {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            color: #c0392b;
+        }
+
+        .empty {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🛎️ Mes Notifications</h2>
+
+        {% if notifications %}
+            <ul>
+                {% for notification in notifications %}
+                    <li class="notification">
+                        {{ notification.message }}
+                        <span class="timestamp">
+                            <i class="fas fa-clock"></i> {{ notification.timestamp|date:"d/m/Y H:i" }}
+                        </span>
+                        <a class="delete-btn" href="{% url 'delete_notification' notification.pk %}">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">Vous n'avez aucune notification pour le moment.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

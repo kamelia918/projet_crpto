@@ -109,6 +109,32 @@
             font-size: 1.2rem;
             display: block;
         }
+        .notification-link {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .notification-link a {
+            background-color: #fff4e5;
+            color: #e67e22;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        .notification-link a i {
+            margin-right: 0.5rem;
+        }
+
+        .notification-link a:hover {
+            background-color: #ffe3c2;
+            color: #d35400;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+       }
+
     </style>
 </head>
 <body>
@@ -129,6 +155,12 @@
 </div>
 {% if is_doctor %}
 <div class="config-section">
+    <div class="notification-link">
+        <a href="{% url 'doctor_pending_appointments' %}">
+            <i class="fas fa-bell"></i> RDVs en attente
+        </a>
+    </div>
+    
     <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'name' %}'">
         <span>Nom complet</span>
         <i class="fas fa-chevron-right"></i>
@@ -159,6 +191,12 @@
 <div class="config-section">
     <!-- <form method="post"> -->
         <!-- {% csrf_token %} -->
+        <div class="notification-link">
+            <a href="{% url 'notifications_list' %}">
+                <i class="fas fa-bell"></i> Voir mes notifications
+            </a>
+        </div>
+        
     
     <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'date_of_birth' %}'">
         <span>Date de Naissance:  {{ patient_form.date_of_birth }} </span>
@@ -216,7 +254,8 @@
     <a href="{% url 'patient_appointments' %}"><i class="fas fa-calendar"></i> Mes RDVs</a>
     {% endif %}
     {% if is_doctor %}
-    <a href="{% url 'appointment_list' %}"><i class="fas fa-calendar"></i> Mes RDVs</a>
+    <a hre
+    f="{% url 'appointment_list' %}"><i class="fas fa-calendar"></i> Mes RDVs</a>
     {% endif %}
     <a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i> Mon compte</a>
 </div>

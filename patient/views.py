@@ -1,4 +1,5 @@
 from django.dispatch import receiver
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
 from .forms import *
@@ -60,6 +61,8 @@ def register(request):
     return render(request, "patient/register.html", {"form": form})
 
 
+from .models import Notification  # Assure-toi que le modèle Notification existe
+
 @login_required
 def profile(request):
     user = request.user
@@ -67,12 +70,16 @@ def profile(request):
     try:
         profile = Profile.objects.get(user=user)
         if profile.role == 'patient':
-            # Check if the user is already in the Patient model
+            # Récupération ou création de l'objet patient
             patient, created = Patient.objects.get_or_create(user=user)
 
-            # Check if there is an existing medical record for the patient
+            # Récupération ou création du dossier médical
             dossier_medical, created = DossierMedical.objects.get_or_create(patient=patient)
 
+            # 🔔 Récupération des dernières notifications du patient
+            notifications = Notification.objects.filter(user=user).order_by('-timestamp')[:5]
+
+            # Traitement du formulaire
             if request.method == 'POST':
                 patient_form = PatientProfileForm(request.POST, instance=patient)
                 if patient_form.is_valid():
@@ -87,22 +94,30 @@ def profile(request):
                 'dossier_form': dossier_form,
                 'is_patient': True,
                 'dossier_medical': dossier_medical,
+                'notifications': notifications,
             })
-        elif profile.role == 'doctor':
-            # Check if the user is already in the Doctor model
-            doctor, created = Doctor.objects.get_or_create(user=user)
 
-            # Implement the doctor-specific logic here
-            # For now, we just redirect to a placeholder page
-            return render(request, 'patient/profile.html', {'user': user, 'is_doctor': True ,  'doctor':doctor})
+        elif profile.role == 'doctor':
+            doctor, created = Doctor.objects.get_or_create(user=user)
+            return render(request, 'patient/profile.html', {
+                'user': user,
+                'is_doctor': True,
+                'doctor': doctor
+            })
 
         else:
-            # For users who are not patients or doctors, display user information
-            return render(request, 'patient/profile.html', {'user': user, 'is_patient': False, 'is_doctor': False})
-    except Profile.DoesNotExist:
-        # Handle case where profile does not exist
-        return render(request, 'patient/profile.html', {'user': user, 'is_patient': False, 'is_doctor': False})
+            return render(request, 'patient/profile.html', {
+                'user': user,
+                'is_patient': False,
+                'is_doctor': False
+            })
 
+    except Profile.DoesNotExist:
+        return render(request, 'patient/profile.html', {
+            'user': user,
+            'is_patient': False,
+            'is_doctor': False
+        })
 
 # mdofication des informations du patient 
 
@@ -497,3 +512,60 @@ def doctor_appointment_view(request):
 
     
      #user.groups = 
+
+@login_required
+def doctor_pending_appointments(request):
+    doctor = Doctor.objects.filter(user=request.user).first()
+    appointments = Appointment.objects.filter(doctor=doctor, statut='en_attente').order_by('-start_datetime')
+    return render(request, 'patient/doctor_pending_appointments.html', {'appointments': appointments})
+
+@login_required
+def update_appointment_status(request, pk, action):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    if request.user != appointment.doctor.user:
+        return HttpResponse("Non autorisé", status=403)
+
+    if action == 'accepter':
+        appointment.statut = 'confirme'
+    elif action == 'refuser':
+        appointment.statut = 'refuse'
+    appointment.save()
+    return redirect('doctor_pending_appointments')
+
+from .models import Notification
+
+@login_required
+def update_appointment_status(request, pk, action):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    if request.user != appointment.doctor.user:
+        return HttpResponse("Non autorisé", status=403)
+
+    if action == 'accepter':
+        appointment.statut = 'confirme'
+        message = f"Votre rendez-vous avec Dr. {appointment.doctor.name} a été accepté."
+    elif action == 'refuser':
+        appointment.statut = 'refuse'
+        message = f"Votre rendez-vous avec Dr. {appointment.doctor.name} a été refusé."
+    else:
+        return HttpResponse("Action invalide", status=400)
+
+    appointment.save()
+
+    # Créer la notification
+    Notification.objects.create(
+        user=appointment.patient.user,
+        message=message
+    )
+
+    return redirect('doctor_pending_appointments')
+
+@login_required
+def notifications_list(request):
+    notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')
+    return render(request, 'patient/notifications.html', {'notifications': notifications})
+
+@login_required
+def delete_notification(request, pk):
+    notification = get_object_or_404(Notification, pk=pk, user=request.user)
+    notification.delete()
+    return redirect('notifications_list')

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rendez-vous en attente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f5f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 3rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+
+        .appointment-card {
+            border-left: 4px solid #4a90e2;
+            background-color: #f9fbff;
+            margin-bottom: 1.2rem;
+            padding: 1.2rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .appointment-card strong {
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .appointment-card p {
+            margin: 0.3rem 0;
+            color: #555;
+        }
+
+        .actions {
+            margin-top: 0.8rem;
+        }
+
+        .actions a {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .actions a.accept {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .actions a.accept:hover {
+            background-color: #1f8c4b;
+        }
+
+        .actions a.refuse {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .actions a.refuse:hover {
+            background-color: #c0392b;
+        }
+
+        .no-appointments {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Rendez-vous en attente</h2>
+        {% if appointments %}
+            {% for appointment in appointments %}
+                <div class="appointment-card">
+                    <strong>Patient : {{ appointment.patient.username }}</strong>
+                    <p>Date : {{ appointment.start_datetime|date:"d M Y H:i" }}</p>
+                    <p>Hôpital : {{ appointment.hospital.name }}</p>
+                    <div class="actions">
+                        <a href="{% url 'update_appointment_status' appointment.pk 'accepter' %}" class="accept">✅ Accepter</a>
+                        <a href="{% url 'update_appointment_status' appointment.pk 'refuser' %}" class="refuse">❌ Refuser</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-appointments">
+                Aucun rendez-vous en attente.
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

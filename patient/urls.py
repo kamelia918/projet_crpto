@@ -55,6 +55,11 @@ urlpatterns = [
     path("doctor_register/", views.register, name="doctor_register"),
 
     path('doctor_appointment_view/', views.doctor_appointment_view, name='doctor_appointment_view'),
+    path('mes_rendezvous/', views.doctor_pending_appointments, name='doctor_pending_appointments'),
+    path('rendezvous/<int:pk>/<str:action>/', views.update_appointment_status, name='update_appointment_status'),
+    path('notifications/', views.notifications_list, name='notifications_list'),
+    path('notifications/delete/<int:pk>/', views.delete_notification, name='delete_notification'),
+
 
     
 ]
