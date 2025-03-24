@@ -1,0 +1,41 @@
+{% extends "patient/base.html" %}
+{%load static%}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mes rendez-vous</title>
+</head>
+<body>
+    <h1>Mes rendez-vous</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Médecin</th>
+                <th>Date et heure de début</th>
+                <th>Date et heure de fin</th>
+                <th>Statut</th>
+                <th>Détails</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.title }}</td>
+                <td>{{ appointment.doctor.user.username }}</td>
+                <td>{{ appointment.start_datetime }}</td>
+                <td>{{ appointment.end_datetime }}</td>
+                <td>{{ appointment.get_statut_display }}</td>
+                <td>{{ appointment.detail }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/book_appointment">réserver un autre  rdv</a>
+
+</body>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "patient/base.html" %}
+{%load static%}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Réserver un rendez-vous</title>
+</head>
+<body>
+    <h1>Réserver un rendez-vous</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Réserver</button>
+    </form>
+    <p>Veuillez entrer la date et l'heure au format DD/MM/YYYY HH:MM (par exemple, 24/03/2025 14:30)</p>
+</body>
+{% endblock %}

@@ -161,13 +161,13 @@
         <!-- {% csrf_token %} -->
     
     <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'date_of_birth' %}'">
-        <span>Date de Naissance:</span>
-        {{ patient_form.date_of_birth }}
+        <span>Date de Naissance:  {{ patient_form.date_of_birth }} </span>
+        
         <i class="fas fa-chevron-right"></i>
     </div>
     <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'address' %}'">
-        <span>Adresse:</span>
-        {{ patient_form.address }}
+        <span>Adresse:    {{ patient_form.address }}</span>
+      
         <i class="fas fa-chevron-right"></i>
     </div>
     <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'medical_history' %}'">
@@ -212,7 +212,12 @@
 {% endif %}
 <div class="bottom-nav">
     <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+    {% if is_patient %}
+    <a href="{% url 'patient_appointments' %}"><i class="fas fa-calendar"></i> Mes RDVs</a>
+    {% endif %}
+    {% if is_doctor %}
     <a href="{% url 'appointment_list' %}"><i class="fas fa-calendar"></i> Mes RDVs</a>
+    {% endif %}
     <a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i> Mon compte</a>
 </div>
 </body>

@@ -195,10 +195,40 @@ def update_profile_photo(request):
     return render(request, 'patient/update_photo.html', {'form': form})
 
 
+# réserver un rdv 
+
+@login_required
+def book_appointment(request):
+    user = request.user
+    try:
+        patient = Patient.objects.get(user=user)
+    except Patient.DoesNotExist:
+        return redirect('profile')  # Redirect to profile if the user is not a patient
+
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.patient = patient
+            appointment.statut = 'en_attente'
+            appointment.save()
+            return redirect('patient_appointments')
+    else:
+        form = AppointmentForm()
+
+    return render(request, 'patient/book_appointment.html', {'form': form})
 
 
+@login_required
+def patient_appointments(request):
+    user = request.user
+    try:
+        patient = Patient.objects.get(user=user)
+    except Patient.DoesNotExist:
+        return redirect('profile')  # Redirige vers le profil si l'utilisateur n'est pas un patient
 
-
+    appointments = Appointment.objects.filter(patient=patient).order_by('-start_datetime')
+    return render(request, 'patient/appointments.html', {'appointments': appointments})
 
 
 

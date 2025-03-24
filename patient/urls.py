@@ -13,7 +13,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path("register/", views.register, name="register"),
     path('logout/', auth_views.LogoutView.as_view(next_page='/login/'), name='logout'), # Redirect to home page after logout
-    
+
     path('profile/', views.profile, name='profile'),
 
     path('patient_profile/edit/', views.Patient_profile_edit, name='patient_profile_edit'),
@@ -24,6 +24,9 @@ urlpatterns = [
 
     path("doctor_profile/photo/", views.update_profile_photo, name="update_profile_photo"),
     
+    path('book_appointment/', views.book_appointment, name='book_appointment'),
+    path('appointments/', views.patient_appointments, name='patient_appointments'),
+
     path("patientinformation/", views.patientinformation, name="patientinformation"),
     path("patientlist/", views.patientlist, name="patientlist"),
 
