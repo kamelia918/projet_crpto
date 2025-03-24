@@ -292,67 +292,7 @@
         </a>
         
       </li>
-
-      <li>
-        <div class="iocn-link">
-          <a href="#">
-            <i class='bx bx-collection' ></i>
-            <span class="link_name">Patients</span>
-          </a>
-          <i class='bx bxs-chevron-down arrow' ></i>
-        </div>
-        <ul class="sub-menu">
-          
-          <li><a href="/patientinformation">Create Patient</a></li>
-          <li><a href="/patientlist">Patient List</a></li>
-        </ul>
-      </li>
-
-      <li>
-        <div class="iocn-link">
-          <a href="#">
-            <i class='bx bx-book-alt' ></i>
-            <span class="link_name">Doctor</span>
-          </a>
-          <i class='bx bxs-chevron-down arrow' ></i>
-        </div>
-        <ul class="sub-menu">
-          <li><a href="/doctorinformation">Create Doctor</a></li>
-          <li><a href="/doctorlist">Doctor List</a></li>
-        </ul>
-      </li>
       
-      
-      <li>
-        <div class="iocn-link">
-          <a href="#">
-            <i class='bx bx-plug' ></i>
-            <span class="link_name">Hospital</span>
-          </a>
-          <i class='bx bxs-chevron-down arrow' ></i>
-        </div>
-        <ul class="sub-menu">
-          
-          <li><a href="/hospitalinformation">Add Hospital</a></li>
-          <li><a href="/hospitallist">Hospitals list</a></li>
-        </ul>
-      </li>
-      <li>
-        <div class="iocn-link">
-          <a href="#">
-            <i class='bx bx-plug' ></i>
-            <span class="link_name">Appointments</span>
-          </a>
-          <i class='bx bxs-chevron-down arrow' ></i>
-        </div>
-        <ul class="sub-menu">
-          
-          <li><a href="/appointment">Appointment List</a></li>
-          
-        </ul>
-      </li>
-      {%endif%}
-    
       <li>
         <div class="iocn-link">
           <a href="#">
@@ -380,6 +320,73 @@
           
         </ul>
       </li>
+
+      {% with request.user.profile as profile %}
+        {% if profile.role != 'patient' %}
+          <li>
+            <div class="iocn-link">
+              <a href="#">
+                <i class='bx bx-collection' ></i>
+                <span class="link_name">Patients</span>
+              </a>
+              <i class='bx bxs-chevron-down arrow' ></i>
+            </div>
+            <ul class="sub-menu">
+              
+              <li><a href="/patientinformation">Create Patient</a></li>
+              <li><a href="/patientlist">Patient List</a></li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="iocn-link">
+              <a href="#">
+                <i class='bx bx-book-alt' ></i>
+                <span class="link_name">Doctor</span>
+              </a>
+              <i class='bx bxs-chevron-down arrow' ></i>
+            </div>
+            <ul class="sub-menu">
+              <li><a href="/doctorinformation">Create Doctor</a></li>
+              <li><a href="/doctorlist">Doctor List</a></li>
+            </ul>
+          </li>
+          
+          
+          <li>
+            <div class="iocn-link">
+              <a href="#">
+                <i class='bx bx-plug' ></i>
+                <span class="link_name">Hospital</span>
+              </a>
+              <i class='bx bxs-chevron-down arrow' ></i>
+            </div>
+            <ul class="sub-menu">
+              
+              <li><a href="/hospitalinformation">Add Hospital</a></li>
+              <li><a href="/hospitallist">Hospitals list</a></li>
+            </ul>
+          </li>
+        {% endif %}
+
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class='bx bx-plug' ></i>
+              <span class="link_name">Appointments</span>
+            </a>
+            <i class='bx bxs-chevron-down arrow' ></i>
+          </div>
+          <ul class="sub-menu">
+            
+            <li><a href="/appointment">Appointment List</a></li>
+            
+          </ul>
+        </li>
+      {% endwith %}
+      {%endif%}
+    
+
   </li>
 </ul>
   </div>
@@ -389,8 +396,8 @@
       <span class="text">DjangoEHR</span>
     </div>
     <div class="main-content" >
-      {%block content%}
-      {%endblock%}
+      {% block content %}
+      {% endblock %}
 
     </div>
   </section>
@@ -409,7 +416,7 @@
         sidebar.classList.toggle("close");
       });
   </script>
-  {%block extrajs%}
-  {%endblock extrajs%}
+  {% block extrajs %}
+  {% endblock extrajs %}
 </body>
 </html>

@@ -21,6 +21,7 @@ class Pharmacie(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_image = models.ImageField(upload_to='profile_images/', default='profile_images/default.jpg', blank=True)
     ROLES = [
         ('admin', 'Admin'),
         ('patient', 'Patient'),

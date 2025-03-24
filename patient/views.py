@@ -1,17 +1,14 @@
+from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
-from django.http import JsonResponse, HttpResponse
 from .forms import *
 from django.views.generic import View
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from django.contrib.auth.models import Group
-from django.shortcuts import render, redirect
+# from django.http import HttpResponseRedirect
+# from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import RegisterForm  # Assuming you have a form for registration
+
 
 
 def home(request):
@@ -21,42 +18,6 @@ def home(request):
     appointment_total=Appointment.objects.count()
     hospital_total=Hospital.objects.count()
     return render(request, "patient/home.html", {"appointments": appointments, "patient_total":patient_total, "doctor_total":doctor_total, "appointment_total":appointment_total, "hospital_total":hospital_total})
-
-# def login(request):
-#     if request.user.is_authenticated():
-#         return render(request, "patient/home.html")
-#     else:
-
-#         return render(request, "registration/login.html")
-
-# from django.shortcuts import render, redirect
-# from django.contrib.auth import authenticate, login as auth_login
-
-# def login(request):
-#     if request.user.is_authenticated:  # ✅ No parentheses
-#         return redirect("patient_home")  # Use `redirect` instead of `render`
-
-#     if request.method == "POST":
-#         username = request.POST.get("username")
-#         password = request.POST.get("password")
-#         user = authenticate(request, username=username, password=password)
-#         if user:
-#             auth_login(request, user)
-#             return redirect("patient_home")  # Redirect after successful login
-
-#     return render(request, "registration/login.html")
-
-# def register(response):
-#     if response.method == "POST":
-#         form = RegisterForm(response.POST)
-#         if form.is_valid():
-#             form.save()
-#         return redirect("/home")
-#     else:
-#         form = RegisterForm()
-
-#         return render(response, "patient/register.html", {"form":form})
-
 
 
 def login(request):
@@ -99,29 +60,157 @@ def register(request):
     return render(request, "patient/register.html", {"form": form})
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Patient
-from .forms import PatientProfileForm
-
 @login_required
 def profile(request):
     user = request.user
 
-    # Check if the user is a patient
-    if user.groups.filter(name='patient').exists():
-        patient, created = Patient.objects.get_or_create(user=user)
-        if request.method == 'POST':
-            form = PatientProfileForm(request.POST, instance=patient)
-            if form.is_valid():
-                form.save()
-                return redirect('profile')
+    try:
+        profile = Profile.objects.get(user=user)
+        if profile.role == 'patient':
+            # Check if the user is already in the Patient model
+            patient, created = Patient.objects.get_or_create(user=user)
+
+            # Check if there is an existing medical record for the patient
+            dossier_medical, created = DossierMedical.objects.get_or_create(patient=patient)
+
+            if request.method == 'POST':
+                patient_form = PatientProfileForm(request.POST, instance=patient)
+                if patient_form.is_valid():
+                    patient_form.save()
+                    return redirect('profile')
+            else:
+                patient_form = PatientProfileForm(instance=patient)
+
+            dossier_form = ReadOnlyDossierMedicalForm(instance=dossier_medical)
+            return render(request, 'patient/profile.html', {
+                'patient_form': patient_form,
+                'dossier_form': dossier_form,
+                'is_patient': True,
+                'dossier_medical': dossier_medical,
+            })
+        elif profile.role == 'doctor':
+            # Check if the user is already in the Doctor model
+            doctor, created = Doctor.objects.get_or_create(user=user)
+
+            # Implement the doctor-specific logic here
+            # For now, we just redirect to a placeholder page
+            return render(request, 'patient/profile.html', {'user': user, 'is_doctor': True ,  'doctor':doctor})
+
         else:
-            form = PatientProfileForm(instance=patient)
-        return render(request, 'patient/profile.html', {'form': form, 'is_patient': True})
+            # For users who are not patients or doctors, display user information
+            return render(request, 'patient/profile.html', {'user': user, 'is_patient': False, 'is_doctor': False})
+    except Profile.DoesNotExist:
+        # Handle case where profile does not exist
+        return render(request, 'patient/profile.html', {'user': user, 'is_patient': False, 'is_doctor': False})
+
+
+# mdofication des informations du patient 
+
+@login_required
+def Patient_profile_edit(request):
+    patient = Patient.objects.filter(user=request.user).first()
+
+    if request.method == "POST":
+        patient.email = request.POST.get("email")
+        patient.address = request.POST.get("address")
+        patient.date_of_birth = request.POST.get("date_of_birth")
+        patient.medical_history = request.POST.get("medicalHistory")
+        patient.save()
+        return redirect('profile')
+
+    return render(request, 'patient/patient_profile_edit.html', {"patient": patient})
+
+@login_required
+def edit_patient_info(request, field):
+    patient = Patient.objects.get(user=request.user)
+    # form_class = dynamic_Patient_form(field)  # Get the dynamic form class
+    class DynamicPatientForm(EditPatientFieldForm):
+        class Meta(EditPatientFieldForm.Meta):
+            fields = [field]
+
+    form = DynamicPatientForm(instance=patient)
+    if request.method == 'POST':
+        form = DynamicPatientForm(request.POST, instance=patient)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+
+    return render(request, 'patient/edit_patient_field.html', {
+        'form': form,
+        'field': field
+    })
+
+# modification des informations du médecin    
+
+@login_required
+def doctor_profile_edit(request):
+    doctor = Doctor.objects.filter(user=request.user).first()
+
+    if request.method == "POST":
+        doctor.name = request.POST.get("name")
+        doctor.gender = request.POST.get("gender")
+        doctor.specialization = request.POST.get("specialization")
+        doctor.license_number = request.POST.get("license_number")
+        doctor.contact_number = request.POST.get("contact_number")
+        doctor.bio = request.POST.get("bio")
+        doctor.save()
+        return redirect('doctor_profile')
+
+    return render(request, 'patient/edit_doctor_profile.html', {"doctor": doctor})
+     
+    
+@login_required
+def edit_doctor_info(request, field):
+    doctor = Doctor.objects.get(user=request.user)
+
+    class DynamicDoctorForm(EditDoctorFieldForm):
+        class Meta(EditDoctorFieldForm.Meta):
+            fields = [field]
+
+    form = DynamicDoctorForm(instance=doctor)
+
+    if request.method == 'POST':
+        form = DynamicDoctorForm(request.POST, instance=doctor)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+
+    return render(request, 'patient/edit_doctor_field.html', {
+        'form': form,
+        'field': field
+    })
+
+# modification de la photo
+
+@login_required
+def update_profile_photo(request):
+    profile = request.user.profile
+    if request.method == 'POST':
+        form = ProfilePhotoForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
     else:
-        # For non-patient users, display user information
-        return render(request, 'patient/profile.html', {'user': user, 'is_patient': False})
+        form = ProfilePhotoForm(instance=profile)
+    return render(request, 'patient/update_photo.html', {'form': form})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def patientinformation(request):
     if request.method == "POST":

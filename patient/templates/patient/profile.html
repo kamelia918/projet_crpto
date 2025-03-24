@@ -1,34 +1,221 @@
-{% extends "patient/base.html" %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Compte - Patient</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+        }
 
-{% block content %}
-<h2>Mon Profil</h2>
+        .header {
+            background-color: #c4d0ea;
+            color: rgb(15, 10, 10);
+            padding: 2rem 1rem 1rem 1rem;
+            text-align: center;
+            border-bottom-left-radius: 50% 20%;
+            border-bottom-right-radius: 50% 20%;
+        }
+
+        .header img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid rgb(243, 248, 250);
+            object-fit: cover;
+        }
+
+        .header h2 {
+            margin: 0.5rem 0 0.2rem 0;
+            font-size: 1.4rem;
+        }
+
+        .header p {
+            margin: 0;
+            font-weight: 600;
+            color: #101111;
+        }
+
+        .btn-profile {
+            background-color: rgb(88, 109, 138);
+            color: #eaf0ff;
+            border: 1px solid #eaf0ff;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .config-section {
+            margin: 2rem 1.5rem;
+        }
+
+        .config-item {
+            background-color: rgb(255, 255, 255);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .config-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .config-item span {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .config-item i {
+            color: #bbb;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: white;
+            border-top: 1px solid #ccc;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+        }
+
+        .bottom-nav a {
+            text-align: center;
+            color: #888;
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .bottom-nav a.active {
+            color: #888;;
+        }
+
+        .bottom-nav a i {
+            font-size: 1.2rem;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    {% if profile.profile_image %}
+        <img src="{{ profile.profile_image.url }}" alt="Avatar">
+    {% else %}
+        <img src="{% static 'img/doctor_avatar.jpg' %}" alt="Avatar">
+    {% endif %}
+    
+
+    <h2> {{ user.username }}</h2>
+    <h2>Email: {{ user.email }}</h2>
+    {% if is_doctor %}
+    <p>{{ doctor.specialization|capfirst }}</p>
+    {% endif %}
+    <a href="{% url 'update_profile_photo' %}" class="btn-profile">Modifier la photo</a>
+</div>
+{% if is_doctor %}
+<div class="config-section">
+    <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'name' %}'">
+        <span>Nom complet</span>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'gender' %}'">
+        <span>Genre</span>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'specialization' %}'">
+        <span>Spécialisation</span>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'license_number' %}'">
+        <span>Numéro de licence</span>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'contact_number' %}'">
+        <span>Numéro de contact</span>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_doctor_info' 'bio' %}'">
+        <span>Bio</span>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+</div>
+{%endif%}
 {% if is_patient %}
-<form method="post">
-    {% csrf_token %}
+<div class="config-section">
+    <!-- <form method="post"> -->
+        <!-- {% csrf_token %} -->
+    
+    <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'date_of_birth' %}'">
+        <span>Date de Naissance:</span>
+        {{ patient_form.date_of_birth }}
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'address' %}'">
+        <span>Adresse:</span>
+        {{ patient_form.address }}
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" onclick="window.location.href='{% url 'edit_patient_info' 'medical_history' %}'">
+        <span>Antécédents Médicaux:</span>
+        {{ patient_form.medical_history }}
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" >
+        <span>MRN:</span>
+        {{ patient_form.MRN }}
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="config-item" >
+        <span>Numéro de téléphone</span>
+        {{ patient_form.contact_number }}
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    <h3>Dossier Médical</h3>
     <div>
-        <label for="id_date_of_birth">Date of Birth:</label>
-        {{ form.date_of_birth }}
+        <label for="id_contenu">Contenu:</label>
+        {{ dossier_form.contenu }}
     </div>
     <div>
-        <label for="id_address">Address:</label>
-        {{ form.address }}
+        <label for="id_diagnosis">Diagnostic:</label>
+        {{ dossier_form.diagnosis }}
     </div>
     <div>
-        <label for="id_medical_history">Medical History:</label>
-        {{ form.medical_history }}
+        <label for="id_drug">Médicament:</label>
+        {{ dossier_form.drug }}
     </div>
     <div>
-        <label for="id_email">Email:</label>
-        {{ form.email }}
+        <label for="id_weight">Poids:</label>
+        {{ dossier_form.weight }}
     </div>
     <div>
-        <label for="id_MRN">MRN:</label>
-        {{ form.MRN }}
+        <label for="id_height">Taille:</label>
+        {{ dossier_form.height }}
     </div>
     <button type="submit">Enregistrer les modifications</button>
-</form>
-{% else %}
-<p>Username: {{ user.username }}</p>
-<p>Email: {{ user.email }}</p>
+<!-- </form> -->
+</div>
 {% endif %}
-{% endblock %}
+<div class="bottom-nav">
+    <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+    <a href="{% url 'appointment_list' %}"><i class="fas fa-calendar"></i> Mes RDVs</a>
+    <a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i> Mon compte</a>
+</div>
+</body>
+
+</html>
+
