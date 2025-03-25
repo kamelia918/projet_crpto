@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Dossier Médical du Patient : {{ patient.username }}</h2>
+<p><strong>Contenu:</strong> {{ dossier.contenu }}</p>
+<p><strong>Diagnostic:</strong> {{ dossier.diagnosis }}</p>
+<p><strong>Médicaments:</strong> {{ dossier.drug }}</p>
+<p><strong>Poids:</strong> {{ dossier.weight }} kg</p>
+<p><strong>Taille:</strong> {{ dossier.height }} m</p>
+<a href="{% url 'doctor_pending_appointments' %}">Retour</a>
+
+</body>
+</html>

@@ -59,7 +59,7 @@ urlpatterns = [
     path('rendezvous/<int:pk>/<str:action>/', views.update_appointment_status, name='update_appointment_status'),
     path('notifications/', views.notifications_list, name='notifications_list'),
     path('notifications/delete/<int:pk>/', views.delete_notification, name='delete_notification'),
-
+    path('appointment/<int:appointment_id>/dossier/', views.view_patient_dossier, name='view_patient_dossier'),
 
     
 ]

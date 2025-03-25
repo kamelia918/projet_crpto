@@ -99,6 +99,7 @@
                     <div class="actions">
                         <a href="{% url 'update_appointment_status' appointment.pk 'accepter' %}" class="accept">✅ Accepter</a>
                         <a href="{% url 'update_appointment_status' appointment.pk 'refuser' %}" class="refuse">❌ Refuser</a>
+                        <a href="{% url 'view_patient_dossier' appointment.pk %}">Voir Dossier Médical</a>
                     </div>
                 </div>
             {% endfor %}

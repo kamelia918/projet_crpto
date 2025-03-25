@@ -569,3 +569,22 @@ def delete_notification(request, pk):
     notification = get_object_or_404(Notification, pk=pk, user=request.user)
     notification.delete()
     return redirect('notifications_list')
+
+@login_required
+def view_patient_dossier(request, appointment_id):
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+
+    # Vérifie que l'utilisateur est bien le médecin concerné
+    if appointment.doctor.user != request.user:
+        return HttpResponse("Non autorisé", status=403)
+
+    dossier = DossierMedical.objects.filter(patient=appointment.patient).first()
+
+    if not dossier:
+        return HttpResponse("Aucun dossier médical trouvé pour ce patient.")
+
+    return render(request, 'patient/view_patient_dossier.html', {
+        'dossier': dossier,
+        'patient': appointment.patient,
+        'appointment': appointment
+    })

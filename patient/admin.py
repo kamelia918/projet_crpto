@@ -5,6 +5,8 @@ admin.site.register(Doctor)
 # admin.site.register(PatientProfile)
 admin.site.register(Hospital)
 admin.site.register(Appointment)
+admin.site.register(DossierMedical)
+
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
